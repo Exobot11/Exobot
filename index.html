@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exobot — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --red-bg-from: 14 0 0;
+            --red-bg-to: 40 0 0;
+            --red-accent: 255 0 0;
+            --red-light: 255 50 50;
+            --gray-light: 243 244 246;
+            --gray-dark: 20 20 20;
+            --glow: 255 0 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, rgb(var(--red-bg-from)) 0%, rgb(var(--red-bg-to)) 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* General layout for main content */
+        .content-section {
+            width: 100%;
+            max-width: 1200px;
+            display: none; /* All sections are hidden by default */
+        }
+
+        .content-section.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .header .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header .nav a {
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            border-radius: 9999px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .header .nav a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .main-page .content {
+            text-align: center;
+            padding: 4rem 1rem;
+            max-width: 900px;
+        }
+
+        .main-page h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 900;
+            line-height: 1.2;
+            background: linear-gradient(to right, #ff8a8a, #ff0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: text-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes text-glow {
+            from {
+                text-shadow: 0 0 5px rgba(255, 0, 0, 0.4);
+            }
+            to {
+                text-shadow: 0 0 20px rgba(255, 0, 0, 0.8), 0 0 30px rgba(255, 0, 0, 0.6);
+            }
+        }
+        
+        .main-page p {
+            margin-top: 1rem;
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            font-weight: 700;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary {
+            background-color: rgb(var(--red-accent));
+            color: white;
+            box-shadow: 0 8px 20px rgba(var(--red-accent), 0.4);
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.2) 1%, transparent 1%);
+            background-size: 1500% 1500%;
+        }
+
+        .btn-primary:hover {
+            background-position: center;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(var(--red-accent), 0.6);
+        }
+
+        .btn-secondary {
+            border: 2px solid rgba(var(--red-light), 0.7);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgb(var(--red-light));
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-4px);
+            border-color: rgb(var(--red-light));
+            box-shadow: 0 8px 20px rgba(var(--red-light), 0.2);
+        }
+
+        .trusted-by {
+            margin-top: 3rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .trusted-by h3 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .trusted-logos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .trusted-logos img {
+            height: 3.5rem;
+            filter: grayscale(100%) brightness(150%);
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .trusted-logos img:hover {
+            opacity: 1;
+            filter: grayscale(0%) brightness(100%);
+        }
+
+        .feature-grid {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(var(--red-accent), 0.2);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(var(--red-light), 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card .icon {
+            font-size: 2.5rem;
+            color: rgb(var(--red-accent));
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 1rem;
+        }
+
+        .feature-card p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 0.5rem;
+        }
+
+        .footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+
+        .logo-image {
+            height: 2.5rem;
+            filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.5));
+        }
+        .lang-button {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .lang-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Styles for the new features and premium pages */
+        .features-list, .pricing-plans {
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem 1rem;
+        }
+        .features-list h2, .pricing-plans h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .features-list ul {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            gap: 1.5rem;
+        }
+        .features-list li {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .features-list li:hover {
+            transform: scale(1.02);
+        }
+        .features-list h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: rgb(var(--red-light));
+            margin-bottom: 0.5rem;
+        }
+        .features-list p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(var(--red-accent), 0.2);
+        }
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        .pricing-card ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 1rem;
+        }
+        .pricing-card li {
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .pricing-card .note {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .pricing-card .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: rgb(var(--red-light));
+            margin-top: 1rem;
+        }
+        /* New styles for the logged-in user profile section */
+        #loggedInUser {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #loggedInUser:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        #loggedInUser img {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            border: 2px solid rgb(var(--red-light));
+        }
+        #loggedInUser span {
+            font-weight: 600;
+            color: white;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .logout-btn:hover {
+            color: rgb(var(--red-light));
+        }
+        /* Styles for the dashboard content */
+        .dashboard-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 900px;
+            padding: 2rem 1rem;
+        }
+        .dashboard-content h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .server-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .server-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(var(--red-accent), 0.2);
+        }
+        .server-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+        }
+        .server-info h4 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        .server-info p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .server-button {
+            margin-left: auto;
+            background-color: rgb(var(--red-accent));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .server-button:hover {
+            background-color: rgba(var(--red-light));
+            transform: translateY(-2px);
+        }
+
+    </style>
+</head>
+<body data-lang="en">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="https://i.postimg.cc/t4vzWjpb/Gemini-Generated-Image-z8qf2dz8qf2dz8qf-removebg-preview.png" alt="Exobot Logo" class="logo-image">
+            Exobot
+        </div>
+        <div class="nav flex items-center gap-6">
+            <a href="#" class="hidden md:block" data-translate="features" data-section="features">Features</a>
+            <!-- This will change to "Dashboard" when logged in -->
+            <a href="#" id="dashboardNav" class="hidden md:block" data-translate="resources" data-section="dashboard">Resources</a>
+            <a href="#" class="hidden md:block" data-translate="premium" data-section="premium">Premium ✨</a>
+            <button id="langButton" class="lang-button" title="Change language">🌐 EN</button>
+            <a id="loginButton" href="https://discord.com/oauth2/authorize?client_id=1410380371459182632&permissions=8&response_type=code&redirect_uri=http%3A%2F%2Fbots1.thteam.me%3A10084%2Fcallback&integration_type=0&scope=guilds+identify+email+bot" class="btn btn-secondary" data-translate="login">Login</a>
+            <!-- New logged-in user UI -->
+            <div id="loggedInUser" style="display: none;">
+                <img id="userAvatar" src="https://placehold.co/100x100/111/FFF?text=User" alt="User Avatar">
+                <span id="userName">User</span>
+                <button id="logoutButton" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Sections -->
+    <!-- The main dashboard landing page content -->
+    <main id="mainSection" class="content-section active">
+        <div class="content flex flex-col items-center main-page" id="heroContent">
+            <h1 id="mainTitle" data-translate="title">Make A Professional<br>Discord Server!</h1>
+            <p id="mainDescription" data-translate="description">A very customizable multipurpose bot for welcome image, In-depth logs, Social commands, Moderation and many more ...</p>
+            <div class="buttons">
+                <a href="https://discord.com/oauth2/authorize?client_id=1410380371459182632&permissions=8&response_type=code&redirect_uri=http%3A%2F%2Fbots1.thteam.me%3A10084%2Fcallback&integration_type=0&scope=guilds+identify+email+bot" class="btn btn-primary" data-translate="addBot">Add To Discord</a>
+                <a href="#" class="btn btn-secondary" data-translate="browseFeatures" data-section="features">Browse Features</a>
+            </div>
+            <div class="trusted-by">
+                <h3 data-translate="trustedByTitle">TRUSTED BY OVER 9,000,000 DISCORD SERVERS, INCLUDING</h3>
+                <div class="trusted-logos">
+                    <!-- Placeholder for trusted server logos -->
+                    <img src="https://placehold.co/150x50/111/FFF?text=Server-A" alt="Server A Logo">
+                    <img src="https://placehold.co/150x50/111/FFF?text=Server-B" alt="Server B Logo">
+                    <img src="https://placehold.co/150x50/111/FFF?text=Server-C" alt="Server C Logo">
+                    <img src="https://placehold.co/150x50/111/FFF?text=Server-D" alt="Server D Logo">
+                </div>
+            </div>
+        </div>
+        <!-- Original feature grid from the main page -->
+        <section class="feature-grid">
+            <div class="feature-card">
+                <div class="icon">✨</div>
+                <h3 data-translate="featureWelcomeTitle">Welcome System</h3>
+                <p data-translate="featureWelcomeDesc">Customize welcome messages and images for new members joining your server.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🔧</div>
+                <h3 data-translate="featureModerationTitle">Moderation</h3>
+                <p data-translate="featureModerationDesc">Powerful moderation tools to keep your community safe and organized.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">📈</div>
+                <h3 data-translate="featureLevelingTitle">Leveling System</h3>
+                <p data-translate="featureLevelingDesc">Engage your members with a customizable XP and leveling system.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">⚙️</div>
+                <h3 data-translate="featureAutoModTitle">Auto-Moderation</h3>
+                <p data-translate="featureAutoModDesc">Automatically detect and handle spam, profanity, and other unwanted content.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🎁</div>
+                <h3 data-translate="featureGiveawaysTitle">Giveaways</h3>
+                <p data-translate="featureGiveawaysDesc">Run simple and effective giveaways directly from your server.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">💬</div>
+                <h3 data-translate="featureCustomCommandsTitle">Custom Commands</h3>
+                <p data-translate="featureCustomCommandsDesc">Create your own commands for your members to use.</p>
+            </div>
+        </section>
+    </main>
+    
+    <!-- New Features Page Content -->
+    <main id="featuresSection" class="content-section">
+        <section class="features-list">
+            <h2 data-translate="featuresPageTitle">All Our Bot Features</h2>
+            <ul>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature1Title">1. Moderation Tools</h4>
+                    <p data-translate="feature1Desc">Helps manage your server automatically with commands like ban, kick, mute, warn, and auto-moderation filters.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature2Title">2. Automated Welcome & Goodbye Messages</h4>
+                    <p data-translate="feature2Desc">Sends customized messages when users join or leave, improving engagement.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature3Title">3. Customizable Commands</h4>
+                    <p data-translate="feature3Desc">Allows you to create your own commands tailored to your server’s needs.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature4Title">4. Leveling & XP System</h4>
+                    <p data-translate="feature4Desc">Tracks user activity and rewards engagement with levels, ranks, and XP.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature5Title">5. Music Playback</h4>
+                    <p data-translate="feature5Desc">Plays music in voice channels from YouTube, Spotify, or other platforms.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature6Title">6. Reaction Roles</h4>
+                    <p data-translate="feature6Desc">Lets users assign themselves roles by reacting to messages.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature7Title">7. Automated Announcements</h4>
+                    <p data-translate="feature7Desc">Can post scheduled updates, server news, or event reminders.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature8Title">8. Analytics & Logs</h4>
+                    <p data-translate="feature8Desc">Tracks server activity, message stats, and moderation logs.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature9Title">9. Custom Embeds & Messages</h4>
+                    <p data-translate="feature9Desc">Enables professional-looking messages with embeds, colors, and formatting.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature10Title">10. Integration with Other Apps</h4>
+                    <p data-translate="feature10Desc">Can connect with Twitch, YouTube, and other platforms for notifications.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature11Title">11. Fun & Engagement</h4>
+                    <p data-translate="feature11Desc">Includes games, memes, quotes, and other interactive features to keep members active.</p>
+                </li>
+                <li class="rounded-lg">
+                    <h4 data-translate="feature12Title">12. Easy to Use</h4>
+                    <p data-translate="feature12Desc">User-friendly dashboard and commands that make server management easier for everyone.</p>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- New Premium Page Content -->
+    <main id="premiumSection" class="content-section">
+        <section class="pricing-plans">
+            <h2 data-translate="premiumPageTitle">Choose Your Plan</h2>
+            <div class="pricing-grid">
+                <!-- Free Plan Card -->
+                <div class="pricing-card">
+                    <h3 data-translate="freePlanTitle">Free Plan</h3>
+                    <ul>
+                        <li data-translate="freePlan1">✅ Basic moderation commands</li>
+                        <li data-translate="freePlan2">✅ Welcome & goodbye messages</li>
+                        <li data-translate="freePlan3">✅ Auto moderation</li>
+                        <li data-translate="freePlan4">✅ Reaction roles</li>
+                        <li data-translate="freePlan5">✅ Limited customization</li>
+                    </ul>
+                    <p class="price" data-translate="freePrice">$0</p>
+                </div>
+                <!-- Premium Plan Card -->
+                <div class="pricing-card">
+                    <h3 data-translate="premiumPlanTitle">Premium Plan</h3>
+                    <ul>
+                        <li data-translate="premiumPlan1">💎 All Free Plan features</li>
+                        <li data-translate="premiumPlan2">💎 Advanced analytics</li>
+                        <li data-translate="premiumPlan3">💎 Custom command creation</li>
+                        <li data-translate="premiumPlan4">💎 Music and DJ features</li>
+                        <li data-translate="premiumPlan5">💎 Auto responses</li>
+                        <li data-translate="premiumPlan6">💎 Priority support</li>
+                        <li data-translate="premiumPlan7">💎 More server customization options</li>
+                    </ul>
+                    <p class="price" data-translate="premiumPrice">$4.99 - $9.99 per month</p>
+                </div>
+                <!-- Pro / Prime Plan Card -->
+                <div class="pricing-card">
+                    <h3 data-translate="proPlanTitle">Pro / Prime Plan</h3>
+                    <ul>
+                        <li data-translate="proPlan1">🌟 All Premium Plan features</li>
+                        <li data-translate="proPlan2">🌟 Unlimited commands & automations</li>
+                        <li data-translate="proPlan3">🌟 Multi-language support</li>
+                        <li data-translate="proPlan4">🌟 Enhanced music & media features</li>
+                        <li data-translate="proPlan5">🌟 VIP support</li>
+                        <li data-translate="proPlan6">🌟 Exclusive perks and early access to new features</li>
+                    </ul>
+                    <p class="price" data-translate="proPrice">$14.99 - $19.99 per month</p>
+                </div>
+            </div>
+            <p class="note" data-translate="pricingNote">Note: Prices may vary based on region or special promotions.</p>
+        </section>
+    </main>
+
+    <!-- New Dashboard Section -->
+    <main id="dashboardSection" class="content-section">
+        <div class="dashboard-content">
+            <h2 data-translate="yourServersTitle">Your Discord Servers</h2>
+            <div class="server-card">
+                <img src="https://placehold.co/100x100/1e293b/FFF?text=Server-A" alt="Server A Icon" class="server-icon">
+                <div class="server-info">
+                    <h4>My Awesome Server</h4>
+                    <p>850 members</p>
+                </div>
+                <a href="#" class="server-button" data-translate="manage">Manage</a>
+            </div>
+            <div class="server-card">
+                <img src="https://placehold.co/100x100/1e293b/FFF?text=Server-B" alt="Server B Icon" class="server-icon">
+                <div class="server-info">
+                    <h4>Community Hangout</h4>
+                    <p>320 members</p>
+                </div>
+                <a href="#" class="server-button" data-translate="manage">Manage</a>
+            </div>
+            <div class="server-card">
+                <img src="https://placehold.co/100x100/1e293b/FFF?text=Server-C" alt="Server C Icon" class="server-icon">
+                <div class="server-info">
+                    <h4>Gaming Guild</h4>
+                    <p>1,200 members</p>
+                </div>
+                <a href="#" class="server-button" data-translate="manage">Manage</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+    <p>&copy; 2025 Exobot. All rights reserved.<br>Bot made by Anouar</p>
+</footer>
+
+    <script>
+        const langButton = document.getElementById('langButton');
+        const navLinks = document.querySelectorAll('.nav a[data-section]');
+        const mainNavLinks = document.querySelectorAll('.header .nav a');
+        const browseFeaturesBtn = document.querySelector('.btn-secondary[data-section="features"]');
+        const contentSections = document.querySelectorAll('.content-section');
+        const loginButton = document.getElementById('loginButton');
+        const loggedInUserDiv = document.getElementById('loggedInUser');
+        const heroContent = document.getElementById('heroContent');
+        const dashboardNav = document.getElementById('dashboardNav');
+        const logoutButton = document.getElementById('logoutButton');
+
+        // IMPORTANT: Replace with your Discord Bot's Client ID
+        const BOT_CLIENT_ID = '1410380371459182632'; 
+        // IMPORTANT: Replace with your redirect URI set in the Discord Developer Portal
+        const REDIRECT_URI = 'http://bots1.thteam.me:10084/callback';
+
+        const translations = {
+            en: {
+                title: "Make A Professional<br>Discord Server!",
+                description: "A very customizable multipurpose bot for welcome image, In-depth logs, Social commands, Moderation and many more ...",
+                addBot: "Add To Discord",
+                browseFeatures: "Browse Features",
+                login: "Login",
+                features: "Features",
+                resources: "Dashboard",
+                premium: "Premium ✨",
+                trustedByTitle: "TRUSTED BY OVER 9,000,000 DISCORD SERVERS, INCLUDING",
+                featureWelcomeTitle: "Welcome System",
+                featureWelcomeDesc: "Customize welcome messages and images for new members joining your server.",
+                featureModerationTitle: "Moderation",
+                featureModerationDesc: "Powerful moderation tools to keep your community safe and organized.",
+                featureLevelingTitle: "Leveling System",
+                featureLevelingDesc: "Engage your members with a customizable XP and leveling system.",
+                featureAutoModTitle: "Auto-Moderation",
+                featureAutoModDesc: "Automatically detect and handle spam, profanity, and other unwanted content.",
+                featureGiveawaysTitle: "Giveaways",
+                featureGiveawaysDesc: "Run simple and effective giveaways directly from your server.",
+                featureCustomCommandsTitle: "Custom Commands",
+                featureCustomCommandsDesc: "Create your own commands for your members to use.",
+                footerText: "&copy; 2025 Exobot. All rights reserved.",
+                featuresPageTitle: "All Our Bot Features",
+                feature1Title: "1. Moderation Tools",
+                feature1Desc: "Helps manage your server automatically with commands like ban, kick, mute, warn, and auto-moderation filters.",
+                feature2Title: "2. Automated Welcome & Goodbye Messages",
+                feature2Desc: "Sends customized messages when users join or leave, improving engagement.",
+                feature3Title: "3. Customizable Commands",
+                feature3Desc: "Allows you to create your own commands tailored to your server’s needs.",
+                feature4Title: "4. Leveling & XP System",
+                feature4Desc: "Tracks user activity and rewards engagement with levels, ranks, and XP.",
+                feature5Title: "5. Music Playback",
+                feature5Desc: "Plays music in voice channels from YouTube, Spotify, or other platforms.",
+                feature6Title: "6. Reaction Roles",
+                feature6Desc: "Lets users assign themselves roles by reacting to messages.",
+                feature7Title: "7. Automated Announcements",
+                feature7Desc: "Can post scheduled updates, server news, or event reminders.",
+                feature8Title: "8. Analytics & Logs",
+                feature8Desc: "Tracks server activity, message stats, and moderation logs.",
+                feature9Title: "9. Custom Embeds & Messages",
+                feature9Desc: "Enables professional-looking messages with embeds, colors, and formatting.",
+                feature10Title: "10. Integration with Other Apps",
+                feature10Desc: "Can connect with Twitch, YouTube, and other platforms for notifications.",
+                feature11Title: "11. Fun & Engagement",
+                feature11Desc: "Includes games, memes, quotes, and other interactive features to keep members active.",
+                feature12Title: "12. Easy to Use",
+                feature12Desc: "User-friendly dashboard and commands that make server management easier for everyone.",
+                premiumPageTitle: "Choose Your Plan",
+                freePlanTitle: "Free Plan",
+                freePlan1: "✅ Basic moderation commands",
+                freePlan2: "✅ Welcome & goodbye messages",
+                freePlan3: "✅ Auto moderation",
+                freePlan4: "✅ Reaction roles",
+                freePlan5: "✅ Limited customization",
+                freePrice: "$0",
+                premiumPlanTitle: "Premium Plan",
+                premiumPlan1: "💎 All Free Plan features",
+                premiumPlan2: "💎 Advanced analytics",
+                premiumPlan3: "💎 Custom command creation",
+                premiumPlan4: "💎 Music and DJ features",
+                premiumPlan5: "💎 Auto responses",
+                premiumPlan6: "💎 Priority support",
+                premiumPlan7: "💎 More server customization options",
+                premiumPrice: "$4.99 - $9.99 per month",
+                proPlanTitle: "Pro / Prime Plan",
+                proPlan1: "🌟 All Premium Plan features",
+                proPlan2: "🌟 Unlimited commands & automations",
+                proPlan3: "🌟 Multi-language support",
+                proPlan4: "🌟 Enhanced music & media features",
+                proPlan5: "🌟 VIP support",
+                proPlan6: "🌟 Exclusive perks and early access to new features",
+                proPrice: "$14.99 - $19.99 per month",
+                pricingNote: "Note: Prices may vary based on region or special promotions.",
+                yourServersTitle: "Your Discord Servers",
+                manage: "Manage"
+            },
+            fr: {
+                title: "Créez Un Serveur<br>Discord Professionnel !",
+                description: "Un bot polyvalent très personnalisable pour les images de bienvenue, les journaux détaillés, les commandes sociales, la modération et bien plus encore ...",
+                addBot: "Ajouter à Discord",
+                browseFeatures: "Parcourir les fonctionnalités",
+                login: "Connexion",
+                features: "Fonctionnalités",
+                resources: "Tableau de bord",
+                premium: "Premium ✨",
+                trustedByTitle: "APPRÉCIÉ PAR PLUS DE 9 000 000 DE SERVEURS DISCORD, Y COMPRIS",
+                featureWelcomeTitle: "Système de bienvenue",
+                featureWelcomeDesc: "Personnalisez les messages et les images de bienvenue pour les nouveaux membres rejoignant votre serveur.",
+                featureModerationTitle: "Modération",
+                featureModerationDesc: "Des outils de modération puissants pour assurer la sécurité et l'organisation de votre communauté.",
+                featureLevelingTitle: "Système de niveaux",
+                featureLevelingDesc: "Engagez vos membres avec un système de XP et de niveaux personnalisable.",
+                featureAutoModTitle: "Auto-Modération",
+                featureAutoModDesc: "Détectez et gérez automatiquement le spam, les propos grossiers et autres contenus indésirables.",
+                featureGiveawaysTitle: "Cadeaux",
+                featureGiveawaysDesc: "Organisez des cadeaux simples et efficaces directement depuis votre serveur.",
+                featureCustomCommandsTitle: "Commandes personnalisées",
+                featureCustomCommandsDesc: "Créez vos propres commandes à utiliser par vos membres.",
+                footerText: "&copy; 2025 Exobot. Tous droits réservés.",
+                featuresPageTitle: "Toutes nos fonctionnalités de bot",
+                feature1Title: "1. Outils de modération",
+                feature1Desc: "Aide à gérer votre serveur automatiquement avec des commandes comme bannir, expulser, rendre muet, avertir et des filtres d'auto-modération.",
+                feature2Title: "2. Messages de bienvenue et d'au revoir automatisés",
+                feature2Desc: "Envoie des messages personnalisés lorsque les utilisateurs rejoignent ou quittent, améliorant l'engagement.",
+                feature3Title: "3. Commandes personnalisables",
+                feature3Desc: "Vous permet de créer vos propres commandes adaptées aux besoins de votre serveur.",
+                feature4Title: "4. Système de niveaux et de XP",
+                feature4Desc: "Suit l'activité des utilisateurs et récompense l'engagement avec des niveaux, des rangs et de l'XP.",
+                feature5Title: "5. Lecture de musique",
+                feature5Desc: "Lit de la musique dans les salons vocaux depuis YouTube, Spotify ou d'autres plateformes.",
+                feature6Title: "6. Rôles par réaction",
+                feature6Desc: "Permet aux utilisateurs de s'attribuer des rôles en réagissant aux messages.",
+                feature7Title: "7. Annonces automatisées",
+                feature7Desc: "Peut publier des mises à jour planifiées, des nouvelles du serveur ou des rappels d'événements.",
+                feature8Title: "8. Analyses et journaux",
+                feature8Desc: "Suit l'activité du serveur, les statistiques de messages et les journaux de modération.",
+                feature9Title: "9. Messages et embeds personnalisés",
+                feature9Desc: "Permet des messages d'apparence professionnelle avec des embeds, des couleurs et des mises en forme.",
+                feature10Title: "10. Intégration avec d'autres applications",
+                feature10Desc: "Peut se connecter avec Twitch, YouTube, et d'autres plateformes pour les notifications.",
+                feature11Title: "11. Amusement et engagement",
+                feature11Desc: "Inclut des jeux, des mèmes, des citations et d'autres fonctionnalités interactives pour maintenir les membres actifs.",
+                feature12Title: "12. Facile à utiliser",
+                feature12Desc: "Tableau de bord et commandes conviviaux qui facilitent la gestion du serveur pour tous.",
+                premiumPageTitle: "Choisissez votre plan",
+                freePlanTitle: "Plan Gratuit",
+                freePlan1: "✅ Commandes de modération de base",
+                freePlan2: "✅ Messages de bienvenue et d'au revoir",
+                freePlan3: "✅ Auto-modération",
+                freePlan4: "✅ Rôles par réaction",
+                freePlan5: "✅ Personnalisation limitée",
+                freePrice: "0 €",
+                premiumPlanTitle: "Plan Premium",
+                premiumPlan1: "💎 Toutes les fonctionnalités du plan gratuit",
+                premiumPlan2: "💎 Analyses avancées",
+                premiumPlan3: "💎 Création de commandes personnalisées",
+                premiumPlan4: "💎 Fonctionnalités de musique et DJ",
+                premiumPlan5: "💎 Réponses automatiques",
+                premiumPlan6: "💎 Support prioritaire",
+                premiumPlan7: "💎 Plus d'options de personnalisation du serveur",
+                premiumPrice: "4.99 € - 9.99 € par mois",
+                proPlanTitle: "Plan Pro / Prime",
+                proPlan1: "🌟 Toutes les fonctionnalités du plan Premium",
+                proPlan2: "🌟 Commandes et automations illimitées",
+                proPlan3: "🌟 Prise en charge multilingue",
+                proPlan4: "🌟 Fonctionnalités musicales et multimédias améliorées",
+                proPlan5: "🌟 Support VIP",
+                proPlan6: "🌟 Avantages exclusifs et accès anticipé aux nouvelles fonctionnalités",
+                proPrice: "14.99 € - 19.99 € par mois",
+                pricingNote: "Note: Les prix peuvent varier en fonction de la région ou des promotions spéciales.",
+                yourServersTitle: "Vos serveurs Discord",
+                manage: "Gérer"
+            },
+            de: {
+                title: "Erstelle Einen Professionellen<br>Discord-Server!",
+                description: "Ein sehr anpassbarer Mehrzweck-Bot für Willkommensbilder, ausführliche Logs, soziale Befehle, Moderation und vieles mehr ...",
+                addBot: "Zu Discord hinzufügen",
+                browseFeatures: "Funktionen ansehen",
+                login: "Anmelden",
+                features: "Funktionen",
+                resources: "Dashboard",
+                premium: "Premium ✨",
+                trustedByTitle: "VERTRAUEN VON ÜBER 9.000.000 DISCORD-SERVERN, DARUNTER",
+                featureWelcomeTitle: "Willkommens-System",
+                featureWelcomeDesc: "Passe Willkommensnachrichten und -bilder für neue Mitglieder auf deinem Server an.",
+                featureModerationTitle: "Moderation",
+                featureModerationDesc: "Leistungsstarke Moderationstools, um deine Community sicher und organisiert zu halten.",
+                featureLevelingTitle: "Leveling-System",
+                featureLevelingDesc: "Binde deine Mitglieder mit einem anpassbaren XP- und Level-System ein.",
+                featureAutoModTitle: "Auto-Moderation",
+                featureAutoModDesc: "Erkennt und behandelt automatisch Spam, Beleidigungen und andere unerwünschte Inhalte.",
+                featureGiveawaysTitle: "Gewinnspiele",
+                featureGiveawaysDesc: "Führe einfache und effektive Gewinnspiele direkt auf deinem Server durch.",
+                featureCustomCommandsTitle: "Eigene Befehle",
+                featureCustomCommandsDesc: "Erstelle eigene Befehle für deine Mitglieder.",
+                footerText: "&copy; 2025 Exobot. Alle Rechte vorbehalten.",
+                featuresPageTitle: "Alle Unsere Bot-Funktionen",
+                feature1Title: "1. Moderations-Tools",
+                feature1Desc: "Unterstützt bei der automatischen Verwaltung deines Servers mit Befehlen wie ban, kick, mute, warn und Auto-Moderation-Filtern.",
+                feature2Title: "2. Automatisierte Willkommens- & Abschiedsnachrichten",
+                feature2Desc: "Sendet angepasste Nachrichten, wenn Benutzer beitreten oder den Server verlassen.",
+                feature3Title: "3. Anpassbare Befehle",
+                feature3Desc: "Ermöglicht dir, eigene Befehle speziell für die Bedürfnisse deines Servers zu erstellen.",
+                feature4Title: "4. Level- & XP-System",
+                feature4Desc: "Verfolgt Benutzeraktivität und belohnt Engagement mit Levels, Rängen und XP.",
+                feature5Title: "5. Musik-Wiedergabe",
+                feature5Desc: "Spielt Musik in Sprachkanälen von YouTube, Spotify oder anderen Plattformen ab.",
+                feature6Title: "6. Reaktions-Rollen",
+                feature6Desc: "Lässt Benutzer sich per Reaktion Rollen zuweisen.",
+                feature7Title: "7. Automatisierte Ankündigungen",
+                feature7Desc: "Kann geplante Updates, Server-Nachrichten oder Event-Erinnerungen posten.",
+                feature8Title: "8. Analyse & Logs",
+                feature8Desc: "Verfolgt Serveraktivität, Nachrichtenstatistiken und Moderations-Logs.",
+                feature9Title: "9. Benutzerdefinierte Embeds & Nachrichten",
+                feature9Desc: "Ermöglicht professionell aussehende Nachrichten mit Embeds, Farben und Formatierung.",
+                feature10Title: "10. Integration mit anderen Apps",
+                feature10Desc: "Kann sich mit Twitch, YouTube und anderen Plattformen für Benachrichtigungen verbinden.",
+                feature11Title: "11. Spaß & Engagement",
+                feature11Desc: "Enthält Spiele, Memes, Zitate und andere interaktive Features, um Mitglieder aktiv zu halten.",
+                feature12Title: "12. Einfach zu bedienen",
+                feature12Desc: "Benutzerfreundliches Dashboard und Befehle, die die Serververwaltung für alle erleichtern.",
+                premiumPageTitle: "Wähle deinen Plan",
+                freePlanTitle: "Kostenloser Plan",
+                freePlan1: "✅ Grundlegende Moderationsbefehle",
+                freePlan2: "✅ Willkommens- & Abschiedsnachrichten",
+                freePlan3: "✅ Auto-Moderation",
+                freePlan4: "✅ Reaktions-Rollen",
+                freePlan5: "✅ Begrenzte Anpassung",
+                freePrice: "€0",
+                premiumPlanTitle: "Premium Plan",
+                premiumPlan1: "💎 Alle Funktionen des kostenlosen Plans",
+                premiumPlan2: "💎 Erweiterte Analysen",
+                premiumPlan3: "💎 Erstellung benutzerdefinierter Befehle",
+                premiumPlan4: "💎 Musik- und DJ-Funktionen",
+                premiumPlan5: "💎 Auto-Antworten",
+                premiumPlan6: "💎 Priorisierter Support",
+                premiumPlan7: "💎 Mehr Anpassungsoptionen für Server",
+                premiumPrice: "€4.99 - €9.99 pro Monat",
+                proPlanTitle: "Pro / Prime Plan",
+                proPlan1: "🌟 Alle Premium-Funktionen",
+                proPlan2: "🌟 Unbegrenzte Befehle & Automationen",
+                proPlan3: "🌟 Mehrsprachige Unterstützung",
+                proPlan4: "🌟 Verbesserte Musik- & Medienfunktionen",
+                proPlan5: "🌟 VIP-Support",
+                proPlan6: "🌟 Exklusive Vorteile & Early-Access",
+                proPrice: "€14.99 - €19.99 pro Monat",
+                pricingNote: "Hinweis: Preise können je nach Region oder Aktionen variieren.",
+                yourServersTitle: "Deine Discord-Server",
+                manage: "Verwalten"
+            },
+            ar: {
+                title: "أنشئ سيرفر<br>ديسكورد احترافي!",
+                description: "بوت متعدد الاستخدامات قابل للتخصيص بشدة لصور الترحيب، سجلات مفصَّلة، أوامر اجتماعية، أدوات تحكيم والمزيد ...",
+                addBot: "أضف إلى ديسكورد",
+                browseFeatures: "تصفح الميزات",
+                login: "تسجيل الدخول",
+                features: "الميزات",
+                resources: "لوحة التحكم",
+                premium: "بريميوم ✨",
+                trustedByTitle: "موثوق من أكثر من 9,000,000 سيرفر ديسكورد، بما في ذلك",
+                featureWelcomeTitle: "نظام الترحيب",
+                featureWelcomeDesc: "خصّص رسائل وصور الترحيب للأعضاء الجدد على سيرفرك.",
+                featureModerationTitle: "التحكيم",
+                featureModerationDesc: "أدوات تحكيم قوية للحفاظ على أمان وتنظيم مجتمعك.",
+                featureLevelingTitle: "نظام التدرج (XP)",
+                featureLevelingDesc: "حفّز أعضاءك بنظام XP ومراتب قابل للتخصيص.",
+                featureAutoModTitle: "التحكيم التلقائي",
+                featureAutoModDesc: "يكتشف ويتعامل تلقائياً مع السبام والشتائم والمحتوى غير المرغوب.",
+                featureGiveawaysTitle: "السحوبات",
+                featureGiveawaysDesc: "نظم سحوبات بسيطة وفعالة مباشرة على سيرفرك.",
+                featureCustomCommandsTitle: "أوامر مخصصة",
+                featureCustomCommandsDesc: "أنشئ أوامر خاصة تناسب احتياجات سيرفرك.",
+                footerText: "&copy; 2025 إكسوبوت. جميع الحقوق محفوظة.",
+                featuresPageTitle: "جميع ميزات البوت",
+                feature1Title: "1. أدوات التحكيم",
+                feature1Desc: "تساعدك على إدارة السيرفر تلقائياً بأوامر مثل الحظر، الطرد، الكتم، التحذير ومرشحات التحكيم التلقائي.",
+                feature2Title: "2. رسائل ترحيب ووداع تلقائية",
+                feature2Desc: "ترسل رسائل مخصصة عند دخول أو خروج المستخدمين لزيادة التفاعل.",
+                feature3Title: "3. أوامر قابلة للتخصيص",
+                feature3Desc: "تمكنك من إنشاء أوامر تناسب حاجة سيرفرك.",
+                feature4Title: "4. نظام التدرج وXP",
+                feature4Desc: "يتتبع نشاط المستخدمين ويكافئ التفاعل بالمستويات والمراتب والـXP.",
+                feature5Title: "5. تشغيل الموسيقى",
+                feature5Desc: "يشغّل الموسيقى في قنوات الصوت من يوتيوب، سبوتيفاي ومنصات أخرى.",
+                feature6Title: "6. أدوار عبر التفاعل",
+                feature6Desc: "يسمح للمستخدمين بتعيين أدوار لأنفسهم عبر التفاعل بالـReaction.",
+                feature7Title: "7. إعلانات تلقائية",
+                feature7Desc: "يمكنه نشر تحديثات مجدولة، أخبار السيرفر أو تذكيرات الأحداث.",
+                feature8Title: "8. تحليلات وسجلات",
+                feature8Desc: "يتابع نشاط السيرفر، إحصاءات الرسائل وسجلات التحكيم.",
+                feature9Title: "9. رسائل مدمجة مخصصة",
+                feature9Desc: "يوفر رسائل بمظهر احترافي باستخدام Embeds، ألوان وتنسيق احترافي.",
+                feature10Title: "10. تكامل مع تطبيقات أخرى",
+                feature10Desc: "يمكن ربطه مع Twitch وYouTube ومنصات أخرى للإشعارات.",
+                feature11Title: "11. ترفيه وتفاعل",
+                feature11Desc: "يتضمن ألعاب، ميمز، اقتباسات وميزات تفاعلية لإبقاء الأعضاء نشِطين.",
+                feature12Title: "12. سهل الاستخدام",
+                feature12Desc: "لوحة تحكم سهلة الاستخدام وأوامر تبسط إدارة السيرفر للجميع.",
+                premiumPageTitle: "اختر خطتك",
+                freePlanTitle: "الخطة المجانية",
+                freePlan1: "✅ أوامر تحكيم أساسية",
+                freePlan2: "✅ رسائل ترحيب ووداع",
+                freePlan3: "✅ تحكيم تلقائي",
+                freePlan4: "✅ أدوار بالتفاعل",
+                freePlan5: "✅ تخصيص محدود",
+                freePrice: "$0",
+                premiumPlanTitle: "خطة بريميوم",
+                premiumPlan1: "💎 كل ميزات الخطة المجانية",
+                premiumPlan2: "💎 تحليلات متقدمة",
+                premiumPlan3: "💎 إنشاء أوامر مخصصة",
+                premiumPlan4: "💎 ميزات موسيقى وDJ",
+                premiumPlan5: "💎 ردود تلقائية",
+                premiumPlan6: "💎 دعم أولوية",
+                premiumPlan7: "💎 المزيد من خيارات تخصيص السيرفر",
+                premiumPrice: "$4.99 - $9.99 شهرياً",
+                proPlanTitle: "خطة Pro / Prime",
+                proPlan1: "🌟 كل ميزات البريميوم",
+                proPlan2: "🌟 أوامر وأتمتة غير محدودة",
+                proPlan3: "🌟 دعم متعدد اللغات",
+                proPlan4: "🌟 ميزات موسيقى ووسائط محسّنة",
+                proPlan5: "🌟 دعم VIP",
+                proPlan6: "🌟 مزايا حصرية وإمكانية الوصول المبكر للميزات",
+                proPrice: "$14.99 - $19.99 شهرياً",
+                pricingNote: "ملاحظة: يمكن أن تختلف الأسعار حسب المنطقة أو العروض.",
+                yourServersTitle: "سيرفرات ديسكورد الخاصة بك",
+                manage: "إدارة"
+            }
+        };
+
+        // languages order for cycling
+        const LANG_ORDER = ['en','fr','de','ar'];
+
+        const updateContent = (lang) => {
+            // set attributes for accessibility and direction
+            document.body.setAttribute('data-lang', lang);
+            document.documentElement.lang = lang === 'ar' ? 'ar' : (lang === 'fr' ? 'fr' : (lang === 'de' ? 'de' : 'en'));
+            document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            // Update visible language button label with flag + code
+            const langLabels = { en: '🌐 EN', fr: '🌐 FR', de: '🌐 DE', ar: '🌐 AR' };
+            langButton.innerText = langLabels[lang] || '🌐';
+
+            // translate elements that have data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (!key) return;
+                const text = translations[lang] && translations[lang][key];
+                if (typeof text !== 'undefined') {
+                    element.innerHTML = text;
+                }
+            });
+
+            // Special: set text alignment for RTL languages
+            if (lang === 'ar') {
+                document.body.style.textAlign = 'right';
+            } else {
+                document.body.style.textAlign = 'left';
+            }
+        };
+        
+        // Navigation logic
+        const showSection = (sectionId) => {
+            contentSections.forEach(section => {
+                section.classList.remove('active');
+            });
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+        };
+
+        const showLoggedInUI = () => {
+            loginButton.style.display = 'none';
+            loggedInUserDiv.style.display = 'flex';
+            heroContent.style.display = 'none';
+            dashboardNav.style.display = 'block';
+            showSection('dashboardSection');
+            console.log("Simulated: User logged in.");
+        };
+
+        const showLoggedOutUI = () => {
+            loginButton.style.display = 'block';
+            loggedInUserDiv.style.display = 'none';
+            heroContent.style.display = 'flex';
+            dashboardNav.style.display = 'none';
+            showSection('mainSection');
+            console.log("Simulated: User logged out.");
+        };
+
+        // Event listener for language button - cycles through languages
+        langButton.addEventListener('click', () => {
+            const currentLang = document.body.getAttribute('data-lang') || 'en';
+            const idx = LANG_ORDER.indexOf(currentLang);
+            const next = LANG_ORDER[(idx + 1) % LANG_ORDER.length];
+            updateContent(next);
+        });
+
+        // Event listeners for navigation links
+        mainNavLinks.forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const sectionAttr = event.target.getAttribute('data-section');
+                if (!sectionAttr) return;
+                const sectionId = sectionAttr + 'Section';
+                if (sectionId) {
+                    showSection(sectionId);
+                }
+            });
+        });
+
+        // Add event listener for the "Browse Features" button
+        if (browseFeaturesBtn) {
+            browseFeaturesBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                showSection('featuresSection');
+            });
+        }
+
+        // Add event listener for the logout button
+        logoutButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            showLoggedOutUI();
+        });
+
+        // Simulated login logic on page load
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authCode = urlParams.get('code');
+            if (authCode) {
+                // In a real app, you would exchange this code for a token and user data
+                // For this example, we'll simulate a successful login
+                showLoggedInUI();
+                // We'll also clear the URL for a cleaner look
+                history.replaceState(null, '', window.location.pathname);
+            } else {
+                showLoggedOutUI();
+            }
+            // default language
+            updateContent('en');
+        }
+        
+    </script>
+</body>
+</html>
